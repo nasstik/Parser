@@ -9,8 +9,7 @@ function parsePage() {
       
     return {
         meta: {
-             language : document.querySelector(' html').getAttribute('lang'),
-             charset : document.querySelector(' meta').getAttribute('charset'),
+             language : document.querySelector('html').getAttribute('lang'),
              title : document.querySelector('title').textContent.split('—')[0].trim(),
              keywords : document.querySelector('[name="keywords"]').getAttribute('content').split(',').map(keyword => keyword.trim()),
              description : document.querySelector('[name="description"]').getAttribute('content'),
@@ -28,16 +27,17 @@ function parsePage() {
                 full: img.dataset.src,
                 alt: img.getAttribute('alt')
               })),
-            isLiked : document.querySelector('figure button').classList.contains,
+            isLiked : document.querySelector('figure button').classList.contains('active'),
             name : document.querySelector('h1').textContent,
             tags : {
                 category : [document.querySelector('.tags span.green').textContent],
                 discount : [document.querySelector('.tags span.red').textContent],
                 label : [document.querySelector('.tags span.blue').textContent]
             },
-            price : document.querySelector('.price').childNodes[0].textContent.trim(),
-            oldPrice : document.querySelector('.price span').textContent.trim(),
-            discount : Number(document.querySelector('.price span').textContent.replace('₽', '').trim()) - Number(document.querySelector('.price').childNodes[0].textContent.replace('₽', '').trim()),
+            price : Number(document.querySelector('.price').childNodes[0].textContent.replace(/[^\d]/g, '').trim()),
+            oldPrice : Number(document.querySelector('.price span').textContent.replace(/[^\d]/g, '').trim()),
+            discount : Number(document.querySelector('.price span').textContent.replace(/[^\d]/g, '').trim()) - Number(document.querySelector('.price').childNodes[0].textContent.replace(/[^\d]/g, '').trim()),
+            discountPercent : (((Number(document.querySelector('.price span').textContent.replace(/[^\d]/g, '').trim()) - Number(document.querySelector('.price').childNodes[0].textContent.replace(/[^\d]/g, '').trim())) / Number(document.querySelector('.price span').textContent.replace(/[^\d]/g, '').trim())) * 100).toFixed(2)  + '%',
             currency : currencyMap[document.querySelector('.price').childNodes[0].textContent.trim()[0]],
             properties : {
                 [document.querySelector('.properties li span').textContent.trim()] : document.querySelector('.properties li ').querySelectorAll('span')[1].textContent.trim(),
@@ -47,7 +47,8 @@ function parsePage() {
             },
             description : document.querySelector('.description').innerHTML.trim().replace(' class="unused"', ''),
         },
-        suggested: [Array.from(document.querySelectorAll('.items article')).map(article => (
+        suggested: Array.from(document.querySelectorAll('.suggested .items article')).map(article => (
+           
             {
                 name : article.querySelector('h3').textContent.trim(),
                 description : article.querySelector('p').textContent.trim(),
@@ -55,12 +56,11 @@ function parsePage() {
                 price : article.querySelector('b').textContent.replace(/[^\d]/g, ''),
                 currency : currencyMap[article.querySelector('b').childNodes[0].textContent.trim()[0]],
             }
+            
         ))
 
-        ],
-        reviews: [
-            
-            Array.from(document.querySelectorAll('.reviews .items article')).map(article => (
+    ,
+        reviews:  Array.from(document.querySelectorAll('.reviews .items article')).map(article => (
                 {
                 title : article.querySelector('.title').textContent.trim(),
                 description : article.querySelector('p').textContent.trim(),
@@ -79,7 +79,7 @@ function parsePage() {
             )
 
 
-        ]
+        
     };
 }
 
